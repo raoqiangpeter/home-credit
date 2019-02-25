@@ -3,7 +3,7 @@
         "username": "raoqiang",
         "password": "123456"
     }, 
-    "data": {
+    "params": {
         "SK_ID_CURR": 100001,
         "NAME_CONTRACT_TYPE": "Cash loans", 
         "CODE_GENDER": "F", 
