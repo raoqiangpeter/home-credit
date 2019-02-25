@@ -12,6 +12,7 @@
 ## Home Credit Default Risk 介绍
 
 kaggle提供的一个贷款审批[数据集](https://www.kaggle.com/c/home-credit-default-risk/data)，通过数据集预测申请者是否能正常支付贷款。<br/>
+
 1,```application_{train|test}.csv```数据集，训练数据和预测数据集；每一条记录代表样本中的一个贷款申请信息。<br/>
 2,```bureau.csv```数据集，信用机构统计的所有客户历史申请数据。对于以上贷款申请客户，该数据集可能包含多笔客户以往的申请数据。<br/>
     
