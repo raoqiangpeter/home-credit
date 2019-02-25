@@ -24,6 +24,7 @@ public class AppSubmitListen {
         try {
             applicationEvaluate.kafkaConsumer(((AppRequest)(JSONObject.parseObject(record.value().toString(), (Type) AppRequest.class))).getParams());
             logger.info("kafka处理成功");
+            // TODO 后续处理及异常处理
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
