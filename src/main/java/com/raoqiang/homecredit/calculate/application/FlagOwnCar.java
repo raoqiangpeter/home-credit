@@ -14,6 +14,10 @@ public class FlagOwnCar implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 FLAG_OWN_CAR 栏位值
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ FLAG_OWN_CAR ]");

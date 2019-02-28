@@ -12,6 +12,10 @@ public class CtaCreditToAnnuityMeanRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 CTA_CREDIT_TO_ANNUITY_MEAN_RATIO 栏位值，= APPROVED_CREDIT_TO_ANNUITY_RATIO_MEAN/CREDIT_TO_ANNUITY_RATIO
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ CTA_CREDIT_TO_ANNUITY_MEAN_RATIO ]");

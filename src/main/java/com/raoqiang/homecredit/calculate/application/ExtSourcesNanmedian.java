@@ -12,6 +12,10 @@ public class ExtSourcesNanmedian implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 EXT_SOURCES_NANMEDIAN 栏位值
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ EXT_SOURCES_NANMEDIAN ]");

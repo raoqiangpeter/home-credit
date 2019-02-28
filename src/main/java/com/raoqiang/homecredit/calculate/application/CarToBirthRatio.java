@@ -12,6 +12,10 @@ public class CarToBirthRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 CAR_TO_BIRTH_RATIO 栏位值，= OWN_CAR_AGE/DAYS_BIRTH
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         // df['CAR_TO_BIRTH_RATIO'] = df['OWN_CAR_AGE'] / df['DAYS_BIRTH']

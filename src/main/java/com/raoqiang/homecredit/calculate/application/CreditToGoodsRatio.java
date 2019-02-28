@@ -11,6 +11,10 @@ import java.util.Map;
 public class CreditToGoodsRatio implements Calculate {
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 CREDIT_TO_GOODS_RATIO 栏位值， = AMT_CREDIT/AMT_GOODS_PRICE
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         // df['CREDIT_TO_GOODS_RATIO'] = df['AMT_CREDIT'] / df['AMT_GOODS_PRICE']

@@ -12,6 +12,10 @@ public class CurrentToApprovedAnnuityMeanRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 CURRENT_TO_APPROVED_ANNUITY_MEAN_RATIO 栏位值，= APPROVED_AMT_ANNUITY_MEAN/AMT_ANNUITY
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ CURRENT_TO_APPROVED_ANNUITY_MEAN_RATIO ]");

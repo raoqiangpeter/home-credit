@@ -12,6 +12,10 @@ public class CtaCreditToAnnuityMaxRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 CTA_CREDIT_TO_ANNUITY_MAX_RATIO 栏位值，= APPROVED_CREDIT_TO_ANNUITY_RATIO_MAX/CREDIT_TO_ANNUITY_RATIO
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ BUREAU_ACTIVE_CREDIT_TO_INCOME_RATIO ]");

@@ -12,6 +12,10 @@ public class PhoneToBirthRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 PHONE_TO_BIRTH_RATIO 栏位值， = DAYS_LAST_PHONE_CHANGE/DAYS_BIRTH
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ PHONE_TO_BIRTH_RATIO ]");

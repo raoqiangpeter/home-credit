@@ -12,6 +12,10 @@ public class IdToBirthRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 ID_TO_BIRTH_RATIO 栏位值
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ ID_TO_BIRTH_RATIO ]");

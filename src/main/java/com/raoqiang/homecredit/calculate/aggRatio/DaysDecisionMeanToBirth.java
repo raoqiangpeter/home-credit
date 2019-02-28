@@ -12,6 +12,10 @@ public class DaysDecisionMeanToBirth implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 DAYS_DECISION_MEAN_TO_BIRTH 栏位值，= APPROVED_DAYS_DECISION_MEAN/DAYS_BIRTH
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ DAYS_DECISION_MEAN_TO_BIRTH ]");

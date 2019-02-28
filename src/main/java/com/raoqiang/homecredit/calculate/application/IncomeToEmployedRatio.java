@@ -12,6 +12,10 @@ public class IncomeToEmployedRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 INCOME_TO_EMPLOYED_RATIO 栏位值， = AMT_INCOME_TOTAL/DAYS_EMPLOYED
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
 //        df['INCOME_TO_EMPLOYED_RATIO'] = df['AMT_INCOME_TOTAL'] / df['DAYS_EMPLOYED']

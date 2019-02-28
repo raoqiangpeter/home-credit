@@ -14,6 +14,10 @@ public class FondkapremontMode implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 FONDKAPREMONT_MODE 栏位值
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ FONDKAPREMONT_MODE ]");

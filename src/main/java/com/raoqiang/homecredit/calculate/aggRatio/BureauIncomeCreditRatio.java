@@ -12,6 +12,10 @@ public class BureauIncomeCreditRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 BUREAU_INCOME_CREDIT_RATIO 栏位值，= BUREAU_AMT_CREDIT_SUM_MEAN/AMT_INCOME_TOTAL
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ BUREAU_INCOME_CREDIT_RATIO ]");

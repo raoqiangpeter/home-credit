@@ -6,10 +6,8 @@ import com.raoqiang.homecredit.calculate.GetValueFromMap;
 import com.raoqiang.homecredit.calculate.StringUtils;
 import com.raoqiang.homecredit.calculate.application.AgeRange;
 import com.raoqiang.homecredit.calculate.constant.DropIndex;
-import com.raoqiang.homecredit.entry.ModelRequest;
-import com.raoqiang.homecredit.entry.Params;
-import com.raoqiang.homecredit.entry.Request;
-import com.raoqiang.homecredit.entry.Response;
+import com.raoqiang.homecredit.dao.HcStreamDao;
+import com.raoqiang.homecredit.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +34,24 @@ public class ApplicationEvaluate {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    private HcStreamDao hcStreamDao;
+
     public void kafkaConsumer(Map appData) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         HttpHeaders headers = getHttpHeaders();
 //        // 读取 application
-        Map appCondition = new HashMap();
+//        System.out.println(appData.get("HC_ID"));
+        // --------------------------流水记录-------------------------------------------- 申请开始
+        String hcId = (String) appData.get("HC_ID");
+        HcStream hcStream = new HcStream();
+        hcStream.setHcId(hcId);
+        hcStream.setHcStatus("A01"); // A01 -> 案件进去
+        hcStream.setHcResult("P"); // P -> 处理中
+        hcStreamDao.insertStream(hcStream);
 
+
+        // ---------------------------封装查询条件
+        Map appCondition = new HashMap();
         appCondition.put("SK_ID_CURR", appData.get("SK_ID_CURR")+"");
         LOG.info("组装 hbase 查询条件 -> " + appCondition);
 
@@ -56,7 +67,12 @@ public class ApplicationEvaluate {
         appAggCondition.put("AGE_RANGE",appData.get("AGE_RANGE")+"");
         appAggCondition.put("CODE_GENDER",appData.get("CODE_GENDER"));
         appAggCondition.put("ORGANIZATION_TYPE",appData.get("ORGANIZATION_TYPE"));
+        // --------------------第一次查询 hbase-----------------------
+        hcStream.setHcStatus("H01");
+        hcStreamDao.insertStream(hcStream);
         Response appAggResponse = getTD(restTemplate, headers, "T_APPLICATION_AGG", appAggCondition);
+
+
 
         // 合并 map
         if(appAggResponse.getData().size() == 1)
@@ -65,6 +81,9 @@ public class ApplicationEvaluate {
         // --------------------------------------------------------------------------------
         // 字段处理
         // 处理 application_train/test
+        hcStream.setHcStatus("Y01");
+        hcStreamDao.insertStream(hcStream);
+
         String[] strs = new String[]{"DaysEmployed", "DaysLastPhoneChange", "ExtSourcesMax", "ExtSourcesMean", "ExtSourcesMin", "NewDocKurt",
                 "ExtSourcesProd", "ExtSourcesWeighted", "AgeRange", "DocumentCount", "CreditToAnnuityRatio",
                 "CreditToGoodsRatio", "AnnuityToIncomeRatio", "CreditToIncomeRatio","IncomeToBirthRatio",
@@ -87,8 +106,11 @@ public class ApplicationEvaluate {
         GetValueFromMap.removeKeysFromMap(appData, DropIndex.APPLICATION_DROP_INDEX);
 
 
+
         // ------------------------------------------------------------------------------------
         // 添加 T_BUREAU_AGG特征
+        hcStream.setHcStatus("H02");
+        hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_BUREAU_AGG 聚合数据");
         Response bureauAgg = getTD(restTemplate, headers, "T_BUREAU_AGG", appCondition);
         if(bureauAgg.getData().size() == 1)
@@ -97,6 +119,8 @@ public class ApplicationEvaluate {
 
         // -----------------------------------------------------------------------------------
         // 添加 PREVIOUS_APPLICATIONS 聚合特征 T_PREVIOUS_AGG
+        hcStream.setHcStatus("H03");
+        hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_PREVIOUS_AGG 聚合数据");
         Response previousAgg = getTD(restTemplate, headers, "T_PREVIOUS_AGG", appCondition);
         if(previousAgg.getData().size() == 1)
@@ -110,6 +134,8 @@ public class ApplicationEvaluate {
 
         // -----------------------------------------------------------------------------------
         // 添加 POS_CASH 聚合特征 T_POS_AGG
+        hcStream.setHcStatus("H04");
+        hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_POS_AGG 聚合数据");
         Response posCashAgg = getTD(restTemplate, headers, "T_POS_AGG", appCondition);
         if(posCashAgg.getData().size() == 1)
@@ -117,6 +143,8 @@ public class ApplicationEvaluate {
 
         // -----------------------------------------------------------------------------------
         // 添加 INSTALLMENT_PAYMENTS 聚合特征 	T_INSTALLMENT_AGG
+        hcStream.setHcStatus("H05");
+        hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_INSTALLMENT_AGG 聚合数据");
         Response insAgg = getTD(restTemplate, headers, "T_INSTALLMENT_AGG", appCondition);
         if(insAgg.getData().size() == 1)
@@ -124,6 +152,8 @@ public class ApplicationEvaluate {
 
         // -----------------------------------------------------------------------------------
         // 添加 CREDIT_CARD 聚合特征 	T_CREDIT_CARD
+        hcStream.setHcStatus("H06");
+        hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_CREDIT_CARD 聚合数据");
         Response creditAgg = getTD(restTemplate, headers, "T_CREDIT_CARD", appCondition);
         if(creditAgg.getData().size() == 1)
@@ -175,7 +205,8 @@ public class ApplicationEvaluate {
         // --------------------------------------------------------------------------------
         // 字段处理 agg
         // 处理 application_train/test
-
+        hcStream.setHcStatus("Y02");
+        hcStreamDao.insertStream(hcStream);
         String[] strAgg = new String[]{"BureauActiveCreditToIncomeRatio", "BureauIncomeCreditRatio",
                 "CtaCreditToAnnuityMaxRatio", "CtaCreditToAnnuityMeanRatio", "CurrentToApprovedAnnuityMaxRatio",
                 "CurrentToApprovedAnnuityMeanRatio","CurrentToApprovedCreditMaxRatio", "CurrentToApprovedCreditMeanRatio",
@@ -191,9 +222,16 @@ public class ApplicationEvaluate {
         // ------------------------------------------------------------------------------------
         // 评估结果
 
+        hcStream.setHcStatus("M01");
+        hcStreamDao.insertStream(hcStream);
         Response result = evaluate(restTemplate, headers, newMap);
         LOG.info("评分结果 ->" + result);
         // TODO 结果数据入MySQL数据库处理
+
+        hcStream.setHcStatus("A99");
+        hcStream.setHcResult("A"); // A -> 结束
+        hcStreamDao.insertStream(hcStream);
+
     }
 
 

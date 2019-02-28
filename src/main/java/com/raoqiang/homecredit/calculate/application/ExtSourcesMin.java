@@ -12,6 +12,10 @@ public class ExtSourcesMin implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 EXT_SOURCES_MIN 栏位值， Math.min(EXT_SOURCE_1, Math.min(EXT_SOURCE_2, EXT_SOURCE_3))
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ EXT_SOURCES_MIN ]");

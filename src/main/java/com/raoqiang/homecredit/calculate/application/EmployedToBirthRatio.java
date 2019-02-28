@@ -12,6 +12,10 @@ public class EmployedToBirthRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 EMPLOYED_TO_BIRTH_RATIO 栏位值， = DAYS_EMPLOYED/DAYS_BIRTH
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ EMPLOYED_TO_BIRTH_RATIO ]");

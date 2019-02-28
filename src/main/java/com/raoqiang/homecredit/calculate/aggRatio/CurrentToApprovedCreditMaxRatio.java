@@ -12,6 +12,10 @@ public class CurrentToApprovedCreditMaxRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 CURRENT_TO_APPROVED_CREDIT_MAX_RATIO 栏位值，= APPROVED_AMT_CREDIT_MAX/AMT_CREDIT
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ CURRENT_TO_APPROVED_CREDIT_MAX_RATIO ]");

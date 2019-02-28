@@ -14,6 +14,10 @@ public class NameEducationType implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 NAME_EDUCATION_TYPE 栏位值
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         // NAME_EDUCATION_TYPE

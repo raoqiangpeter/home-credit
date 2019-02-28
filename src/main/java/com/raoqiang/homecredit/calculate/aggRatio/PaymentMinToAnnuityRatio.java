@@ -12,6 +12,10 @@ public class PaymentMinToAnnuityRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 PAYMENT_MIN_TO_ANNUITY_RATIO 栏位值，= INS_AMT_PAYMENT_MIN/AMT_ANNUITY
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         LOG.info("Calculate feature [ PAYMENT_MIN_TO_ANNUITY_RATIO ]");

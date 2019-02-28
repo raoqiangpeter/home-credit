@@ -12,6 +12,10 @@ public class AnnuityToIncomeRatio implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(ApplicationEvaluate.class);
 
+    /**
+     * 计算 ANNUITY_TO_INCOME_RATIO 栏位值，= AMT_ANNUITY/AMT_INCOME_TOTAL
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         //df['ANNUITY_TO_INCOME_RATIO'] = df['AMT_ANNUITY'] / df['AMT_INCOME_TOTAL']
