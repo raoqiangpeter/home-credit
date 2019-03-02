@@ -4,6 +4,7 @@ package com.raoqiang.homecredit.controllers;
 import com.alibaba.fastjson.JSONObject;
 import com.raoqiang.homecredit.entry.AppRequest;
 import com.raoqiang.homecredit.entry.Response;
+import com.raoqiang.homecredit.utils.RandomStr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,9 @@ public class CollectController {
     @ResponseBody
     public Response appSubmit(@RequestBody AppRequest appInfo) {
         Date now = new Date( );
-        int a = new Random().nextInt(8999) + 1000;
         SimpleDateFormat ft = new SimpleDateFormat ("yyyyMMddhhmmss");
-        String hcId = ft.format(now) + a + 1;
+        String str = RandomStr.randomString(5);
+        String hcId = ft.format(now) + str + 1;
         appInfo.getParams().put("HC_ID", hcId);
         try {
             kafkaTemplate.send(top, JSONObject.toJSONString(appInfo));

@@ -6,6 +6,11 @@ import com.raoqiang.homecredit.calculate.GetValueFromMap;
 import java.util.Map;
 
 public class DebtPercentage implements Calculate {
+
+    /**
+     * 计算 DEBT_PERCENTAGE 栏位值， = AMT_CREDIT_SUM / AMT_CREDIT_SUM_DEBT
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
 

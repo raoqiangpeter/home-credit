@@ -1,5 +1,8 @@
 package com.raoqiang.homecredit.entry;
 
+/**
+ * hbase 查询请求类
+ */
 public class Request {
 
     private AnthInfo anthInfo;

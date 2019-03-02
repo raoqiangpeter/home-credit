@@ -1,5 +1,8 @@
 package com.raoqiang.homecredit.entry;
 
+/**
+ * 身份验证类
+ */
 public class AnthInfo {
 
     private String username;

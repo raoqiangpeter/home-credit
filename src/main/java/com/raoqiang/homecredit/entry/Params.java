@@ -3,10 +3,15 @@ package com.raoqiang.homecredit.entry;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * hbase请求参数类
+ */
 public class Params {
 
+    // 表名
     private String tableName;
 
+    // 索引名
     private String indexName;
 
     public String getIndexName() {
@@ -17,8 +22,10 @@ public class Params {
         this.indexName = indexName;
     }
 
+    // 查询条件
     private Map<String, Object> condition;
 
+    // 需要的查询字段，null则查询所有字段
     private Set<String> columns;
 
     public Params() {

@@ -7,6 +7,11 @@ import com.raoqiang.homecredit.calculate.constant.BureauBalanceOneHotIndex;
 import java.util.Map;
 
 public class StatusOneHotIndex implements Calculate {
+
+    /**
+     * 计算 STATUS 栏位值对应的 ONE_HOT编码
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         String STATUS = GetValueFromMap.getString(map, "STATUS");

@@ -6,6 +6,11 @@ import com.raoqiang.homecredit.calculate.GetValueFromMap;
 import java.util.Map;
 
 public class CreditDuration implements Calculate {
+
+    /**
+     * 计算 CREDIT_DURATION 栏位值
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         // bureau['CREDIT_DURATION'] = -bureau['DAYS_CREDIT'] + bureau['DAYS_CREDIT_ENDDATE']

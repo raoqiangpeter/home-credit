@@ -2,16 +2,24 @@ package com.raoqiang.homecredit.entry;
 
 import java.util.List;
 
+/**
+ * 请求响应类。通用类
+ */
 public class Response {
 
+    // 状态 1表示正常
     private int status;
 
+    // 响应信息/说明
     private String message;
 
+    // 响应是否成功
     private boolean success;
 
+    // data长度
     private int length;
 
+    // 数据体
     private List data;
 
     public int getStatus() {

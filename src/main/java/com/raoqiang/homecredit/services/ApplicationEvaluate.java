@@ -6,6 +6,7 @@ import com.raoqiang.homecredit.calculate.GetValueFromMap;
 import com.raoqiang.homecredit.calculate.StringUtils;
 import com.raoqiang.homecredit.calculate.application.AgeRange;
 import com.raoqiang.homecredit.calculate.constant.DropIndex;
+import com.raoqiang.homecredit.dao.HcResultDao;
 import com.raoqiang.homecredit.dao.HcStreamDao;
 import com.raoqiang.homecredit.entry.*;
 import org.apache.commons.logging.Log;
@@ -16,8 +17,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -37,7 +40,10 @@ public class ApplicationEvaluate {
     @Autowired
     private HcStreamDao hcStreamDao;
 
-    public void kafkaConsumer(Map appData) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    @Autowired
+    private HcResultDao hcResultDao;
+
+    public void kafkaConsumer(Map appData){
         HttpHeaders headers = getHttpHeaders();
 //        // 读取 application
 //        System.out.println(appData.get("HC_ID"));
@@ -52,6 +58,7 @@ public class ApplicationEvaluate {
 
         // ---------------------------封装查询条件
         Map appCondition = new HashMap();
+        String skId = appData.get("SK_ID_CURR")+"";
         appCondition.put("SK_ID_CURR", appData.get("SK_ID_CURR")+"");
         LOG.info("组装 hbase 查询条件 -> " + appCondition);
 
@@ -70,12 +77,19 @@ public class ApplicationEvaluate {
         // --------------------第一次查询 hbase-----------------------
         hcStream.setHcStatus("H01");
         hcStreamDao.insertStream(hcStream);
-        Response appAggResponse = getTD(restTemplate, headers, "T_APPLICATION_AGG", appAggCondition);
-
-
-
+        Response appAggResponse = null;
+        try {
+            appAggResponse = getTD(restTemplate, headers, "T_APPLICATION_AGG", appAggCondition);
+        }catch (RestClientException e){
+            LOG.error("执行查询 T_APPLICATION_AGG  失败 -> " + e.getMessage());
+            hcStream.setHcResult("E");
+            hcStreamDao.insertStream(hcStream);
+            // 继续执行
+            hcStream.setHcResult("P");
+        }
+        //
         // 合并 map
-        if(appAggResponse.getData().size() == 1)
+        if(appAggResponse!=null&&appAggResponse.getData().size() == 1)
             appData.putAll(((Map)(appAggResponse.getData().get(0))));
 
         // --------------------------------------------------------------------------------
@@ -97,9 +111,26 @@ public class ApplicationEvaluate {
         LOG.info("对申请数据进行清洗处理。 ");
         Class<?> clazz;
         for(String s: strs){
-            clazz = Class.forName("com.raoqiang.homecredit.calculate.application."+s);
-            calculate = (Calculate) clazz.newInstance();
+            try {
+                clazz = Class.forName("com.raoqiang.homecredit.calculate.application."+s);
+                calculate = (Calculate) clazz.newInstance();
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                calculate = null;
+                LOG.error("第一次执行特征计算异常 -> "+e.getMessage());
+                hcStream.setHcResult("E");
+            }
+            if (calculate == null){
+                continue;
+            }
             calculate.labelCalculate(appData);
+        }
+
+        // 流程异常处理 -> 将流水设置为E -> 异常状态
+        if ("E".equals(hcStream.getHcResult())){
+            hcStreamDao.insertStream(hcStream);
+            // 流程继续 -> 流水置为P
+            hcStream.setHcResult("P");
         }
         // 移除栏位信息
         LOG.info("移除非必要栏位 -> " + Arrays.toString(DropIndex.APPLICATION_DROP_INDEX));
@@ -112,8 +143,18 @@ public class ApplicationEvaluate {
         hcStream.setHcStatus("H02");
         hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_BUREAU_AGG 聚合数据");
-        Response bureauAgg = getTD(restTemplate, headers, "T_BUREAU_AGG", appCondition);
-        if(bureauAgg.getData().size() == 1)
+        Response bureauAgg =null;
+        try {
+            bureauAgg = getTD(restTemplate, headers, "T_BUREAU_AGG", appCondition);
+        }catch (RestClientException e){
+            LOG.error("执行查询 T_BUREAU_AGG  失败 -> " + e.getMessage());
+            hcStream.setHcResult("E");
+            hcStreamDao.insertStream(hcStream);
+            // 继续执行
+            hcStream.setHcResult("P");
+        }
+
+        if(bureauAgg!=null&&bureauAgg.getData().size() == 1)
             appData.putAll(((Map)(bureauAgg.getData().get(0))));
 
 
@@ -122,8 +163,18 @@ public class ApplicationEvaluate {
         hcStream.setHcStatus("H03");
         hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_PREVIOUS_AGG 聚合数据");
-        Response previousAgg = getTD(restTemplate, headers, "T_PREVIOUS_AGG", appCondition);
-        if(previousAgg.getData().size() == 1)
+        Response previousAgg = null;
+        try {
+            previousAgg = getTD(restTemplate, headers, "T_PREVIOUS_AGG", appCondition);
+        }catch (RestClientException e){
+            LOG.error("执行查询 T_PREVIOUS_AGG  失败 -> " + e.getMessage());
+            hcStream.setHcResult("E");
+            hcStreamDao.insertStream(hcStream);
+            // 继续执行
+            hcStream.setHcResult("P");
+        }
+
+        if(previousAgg!=null&&previousAgg.getData().size() == 1)
             appData.putAll(((Map)(previousAgg.getData().get(0))));
 
         // TODO TOTAL_REPAYMENT_RATIO 栏位错误  BUREAU_DEBT_OVER_CREDIT BUREAU_ACTIVE_DEBT_OVER_CREDIT
@@ -137,8 +188,18 @@ public class ApplicationEvaluate {
         hcStream.setHcStatus("H04");
         hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_POS_AGG 聚合数据");
-        Response posCashAgg = getTD(restTemplate, headers, "T_POS_AGG", appCondition);
-        if(posCashAgg.getData().size() == 1)
+        Response posCashAgg=null;
+        try {
+            posCashAgg = getTD(restTemplate, headers, "T_POS_AGG", appCondition);
+        }catch (RestClientException e){
+            LOG.error("执行查询 T_POS_AGG  失败 -> " + e.getMessage());
+            hcStream.setHcResult("E");
+            hcStreamDao.insertStream(hcStream);
+            // 继续执行
+            hcStream.setHcResult("P");
+        }
+
+        if(posCashAgg!=null&&posCashAgg.getData().size() == 1)
             appData.putAll(((Map)(posCashAgg.getData().get(0))));
 
         // -----------------------------------------------------------------------------------
@@ -146,8 +207,18 @@ public class ApplicationEvaluate {
         hcStream.setHcStatus("H05");
         hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_INSTALLMENT_AGG 聚合数据");
-        Response insAgg = getTD(restTemplate, headers, "T_INSTALLMENT_AGG", appCondition);
-        if(insAgg.getData().size() == 1)
+        Response insAgg=null;
+        try {
+            insAgg = getTD(restTemplate, headers, "T_INSTALLMENT_AGG", appCondition);
+        }catch (RestClientException e){
+            LOG.error("执行查询 T_INSTALLMENT_AGG  失败 -> " + e.getMessage());
+            hcStream.setHcResult("E");
+            hcStreamDao.insertStream(hcStream);
+            // 继续执行
+            hcStream.setHcResult("P");
+        }
+
+        if(insAgg!=null&&insAgg.getData().size() == 1)
             appData.putAll(((Map)(insAgg.getData().get(0))));
 
         // -----------------------------------------------------------------------------------
@@ -155,8 +226,18 @@ public class ApplicationEvaluate {
         hcStream.setHcStatus("H06");
         hcStreamDao.insertStream(hcStream);
         LOG.info("查询获取 T_CREDIT_CARD 聚合数据");
-        Response creditAgg = getTD(restTemplate, headers, "T_CREDIT_CARD", appCondition);
-        if(creditAgg.getData().size() == 1)
+        Response creditAgg = null;
+        try {
+            creditAgg = getTD(restTemplate, headers, "T_CREDIT_CARD", appCondition);
+        }catch (RestClientException e){
+            LOG.error("执行查询 T_CREDIT_CARD  失败 -> " + e.getMessage());
+            hcStream.setHcResult("E");
+            hcStreamDao.insertStream(hcStream);
+            // 继续执行
+            hcStream.setHcResult("P");
+        }
+
+        if(creditAgg!=null&&creditAgg.getData().size() == 1)
             appData.putAll(((Map)(creditAgg.getData().get(0))));
 
 
@@ -169,7 +250,6 @@ public class ApplicationEvaluate {
 
         // -----------------------------------------------------------------------------------
         // 由于字段名特殊字符转换
-        int co = 0;
         String[] tmp = StringUtils.standard.split("\n");
         Map newMap = new HashMap();
         List list = new LinkedList();
@@ -178,29 +258,14 @@ public class ApplicationEvaluate {
             if (appData.containsKey(toHbase(s))){
                 newMap.put(s, appData.get(toHbase(s)));
                 list.add(s);
-                co++;
             }else {
                 newMap.put(s, null);
             }
         }
-        int c = 0;
-
-        for(Object key : appData.keySet()){
-            if(appData.get(key)==null || appData.get(key).equals("NaN") || appData.get(key).equals("") || appData.get(key).equals("null")){
-                appData.put(key, null);
-            }else {
-                c++;
-            }
-
-        }
 
         // 清洗，去除栏位为 空 / null / NaN
-        for(Object key : newMap.keySet()){
-            if(newMap.get(key)==null || newMap.get(key).equals("NaN") || newMap.get(key).equals("") || newMap.get(key).equals("null")){
-                newMap.put(key, null);
-            }
-
-        }
+        mapUtils(appData);
+        mapUtils(newMap);
 
         // --------------------------------------------------------------------------------
         // 字段处理 agg
@@ -215,22 +280,56 @@ public class ApplicationEvaluate {
         };
         LOG.info("再次进行数据处理");
         for(String s: strAgg){
-            clazz = Class.forName("com.raoqiang.homecredit.calculate.aggRatio."+s);
-            calculate = (Calculate) clazz.newInstance();
-            calculate.labelCalculate(newMap);
+            try {
+                clazz = Class.forName("com.raoqiang.homecredit.calculate.aggRatio."+s);
+                calculate = (Calculate) clazz.newInstance();
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                calculate = null;
+                LOG.error("第二次执行特征计算异常 -> "+e.getMessage());
+                hcStream.setHcResult("E");
+            }
+            if (calculate == null){
+                continue;
+            }
+            calculate.labelCalculate(appData);
         }
+
+        // 流程异常处理 -> 将流水设置为E -> 异常状态
+        if ("E".equals(hcStream.getHcResult())){
+            hcStreamDao.insertStream(hcStream);
+            // 流程继续 -> 流水置为P
+            hcStream.setHcResult("P");
+        }
+
         // ------------------------------------------------------------------------------------
         // 评估结果
 
         hcStream.setHcStatus("M01");
         hcStreamDao.insertStream(hcStream);
-        Response result = evaluate(restTemplate, headers, newMap);
-        LOG.info("评分结果 ->" + result);
-        // TODO 结果数据入MySQL数据库处理
+        Response result;
+        HcResult hcResult = new HcResult();
+        hcResult.setHcId(hcId);
+        hcResult.setHcSkId(skId);
+        try {
+            result = evaluate(restTemplate, headers, newMap);
+            hcResult.setHcScore(new BigDecimal(((Map)result.getData().get(0)).get("1")+""));
+            hcStream.setHcResult("A"); // A -> 结束
 
+        }catch (RestClientException e){
+            LOG.error("执行模型评估失败 -> " + e.getMessage());
+            result = new Response();
+            result.setSuccess(false);
+            result.setMessage("执行模型评估失败");
+            hcResult.setHcScore(new BigDecimal("-1"));
+            hcStream.setHcResult("E"); // E -> 异常
+        }
+
+        LOG.info("评分结果 ->" + result);
         hcStream.setHcStatus("A99");
-        hcStream.setHcResult("A"); // A -> 结束
         hcStreamDao.insertStream(hcStream);
+        hcResultDao.insertResult(hcResult);
+
 
     }
 
@@ -244,7 +343,7 @@ public class ApplicationEvaluate {
     }
 
 
-    private Response getTD(RestTemplate restTemplate, HttpHeaders headers, String table, Map condition){
+    private Response getTD(RestTemplate restTemplate, HttpHeaders headers, String table, Map condition) throws RestClientException{
         Request request = new Request();
         Params param = new Params();
         param.setTableName(table);
@@ -255,7 +354,7 @@ public class ApplicationEvaluate {
         return restTemplate.postForObject(phoenix_url, formEntity, Response.class);
     }
 
-    private Response evaluate(RestTemplate restTemplate, HttpHeaders headers, Map para){
+    private Response evaluate(RestTemplate restTemplate, HttpHeaders headers, Map para) throws RestClientException{
         ModelRequest modelRequest = new ModelRequest();
         modelRequest.setParams(para);
         HttpEntity<String> formEntity = new HttpEntity<String>(JSONObject.toJSONString(modelRequest), headers);
@@ -274,6 +373,14 @@ public class ApplicationEvaluate {
                 .replace("-", "AADECAA")
                 .replace("(", "AALEFTAA")
                 .replace(")", "AARIGHTAA").toUpperCase();
+    }
+
+    private void mapUtils(Map appData){
+        for(Object key : appData.keySet()){
+            if(appData.get(key)==null || appData.get(key).equals("NaN") || appData.get(key).equals("") || appData.get(key).equals("null")){
+                appData.put(key, null);
+            }
+        }
     }
 
 }

@@ -6,6 +6,11 @@ import com.raoqiang.homecredit.calculate.GetValueFromMap;
 import java.util.Map;
 
 public class CreditToAnnuityRatio implements Calculate {
+
+    /**
+     * 计算 CREDIT_TO_ANNUITY_RATIO 栏位值， = AMT_CREDIT_SUM / AMT_ANNUITY
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         //bureau['CREDIT_TO_ANNUITY_RATIO'] = bureau['AMT_CREDIT_SUM'] / bureau['AMT_ANNUITY']

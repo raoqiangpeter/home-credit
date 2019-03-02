@@ -6,6 +6,11 @@ import com.raoqiang.homecredit.calculate.GetValueFromMap;
 import java.util.Map;
 
 public class EnddateDif implements Calculate {
+
+    /**
+     * 计算 ENDDATE_DIF 栏位值， = DAYS_CREDIT_ENDDATE - DAYS_ENDDATE_FACT
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         // bureau['ENDDATE_DIF'] = bureau['DAYS_CREDIT_ENDDATE'] - bureau['DAYS_ENDDATE_FACT']

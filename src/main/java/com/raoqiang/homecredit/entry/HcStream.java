@@ -3,6 +3,9 @@ package com.raoqiang.homecredit.entry;
 import java.math.BigInteger;
 import java.util.Date;
 
+/**
+ * 流程类 -> 数据库 hc_stream表
+ */
 public class HcStream {
     private BigInteger id;
     private String hcId;

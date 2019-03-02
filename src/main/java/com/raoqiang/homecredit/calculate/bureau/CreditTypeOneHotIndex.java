@@ -7,6 +7,11 @@ import com.raoqiang.homecredit.calculate.constant.BureauOneHotIndex;
 import java.util.Map;
 
 public class CreditTypeOneHotIndex implements Calculate {
+
+    /**
+     * 计算 CREDIT_TYPE 栏位值对应的 ONE_HOT编码
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
         String CREDIT_TYPE = GetValueFromMap.getString(map, "CREDIT_TYPE");

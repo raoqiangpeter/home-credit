@@ -12,6 +12,10 @@ public class CreditCurrencyOneHotIndex implements Calculate {
 
     private static final Log LOG = LogFactory.getLog(CreditCurrencyOneHotIndex.class);
 
+    /**
+     * 计算 CreditCurrencyOneHotIndex 栏位值
+     * @param map 申请信息
+     */
     @Override
     public void labelCalculate(Map map) {
 

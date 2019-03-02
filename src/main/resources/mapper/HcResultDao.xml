@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.raoqiang.homecredit.dao.HcResultDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.raoqiang.homecredit.entry.HcResult">
+        <id column="id" property="id" />
+        <result column="hc_id" property="hcId" />
+        <result column="hc_sk_id" property="hcSkId" />
+        <result column="hc_score" property="hcScore" />
+        <result column="hc_time" property="hcTime" />
+    </resultMap>
+
+    <insert id="insertResult" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.raoqiang.homecredit.entry.HcResult">
+        insert into t_result(hc_id, hc_sk_id, hc_score)
+        values(#{hcId}, #{hcSkId}, #{hcScore})
+    </insert>
+
+
+</mapper>

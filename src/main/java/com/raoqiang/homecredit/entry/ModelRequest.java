@@ -3,12 +3,16 @@ package com.raoqiang.homecredit.entry;
 
 import java.util.Map;
 
+/**
+ * 预测模型请求json数据
+ */
 public class ModelRequest {
 
     private AnthInfo anthInfo;
 
 //    private Map
 
+    // 存放字段内容
     private Map params;
 
     public AnthInfo getAnthInfo() {

@@ -17,6 +17,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * kafka生产者消费者配置类
+ */
 @Configuration
 @EnableKafka
 public class KafkaConsumerConfig {
