@@ -45,5 +45,5 @@ kaggle提供的一个贷款审批[数据集](https://www.kaggle.com/c/home-credi
 8, 第五次查询hbase数据，新增 ```installments_payments.csv```数据提取字段。<br/>
 9, 第六次查询hbase数据，新增 ```credit_card_balance.csv```数据提取字段。<br/>
 10,第二次数据清洗，特征计算，这里的栏位依赖hbase查询结果。<br/>
-11，调用model服务，预测结果，数据落地 -> mysql。
-12, spark-streaming 对接入数据进行监测，监测指标为每5秒钟申请量。
+11，调用model服务，预测结果，数据落地 -> mysql。<br/>
+12, spark-streaming 对接入数据进行监测，监测指标为每5秒钟申请量。<br/>
