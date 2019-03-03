@@ -8,6 +8,7 @@
     
 3，phoenix，一个支持hbase二级索引的标准实时查询接口服务 [phoenix](https://github.com/raoqiangpeter/phoenix)
 
+![项目流程图](fl.png "项目流程图")
 
 ## Home Credit Default Risk 介绍
 
@@ -22,3 +23,6 @@ kaggle提供的一个贷款审批[数据集](https://www.kaggle.com/c/home-credi
 7, ```installments_payments.csv``` 申请人房屋贷款历史还款数据。<br/>
 
 ![数据关系图](home_credit.png "数据关系图")
+
+
+## 项目流程 介绍
