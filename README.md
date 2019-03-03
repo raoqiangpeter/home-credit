@@ -33,6 +33,8 @@ kaggle提供的一个贷款审批[数据集](https://www.kaggle.com/c/home-credi
 后台：```java```, ```python```, ```spring```, ```mybaits```
 
 ### 流程
+下面介绍kafka消费者处理流程：
+![消费者流程图](hc.png "消费者流程图")
 1, 数据接入发送至kafka topic -> ```HC00_APPLICATION_SUBMIT```,返回调用方接收数据成功。<br/>
 2, kafka消费者对接收申请数据消费，topic存在两个分区；为增加并行性，采用两个消费者对0/1分区消费。<br/>
 3, 申请数据预处理(栏位清洗)，主要为必要查询hbase字段，通过清洗的申请数据栏位，第一次查询hbase数据；该部分数据为```application_{train|test}.csv```聚合提取数据。<br/>
