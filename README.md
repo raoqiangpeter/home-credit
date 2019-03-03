@@ -26,3 +26,21 @@ kaggle提供的一个贷款审批[数据集](https://www.kaggle.com/c/home-credi
 
 
 ## 项目流程 介绍
+
+### 应用技术
+数据存储：```MySQL```，```hadoop hdfs```，```hbase``` + ```phoenix```<br/>
+中间件: ```kafka```, ```spark```, ```spark-streaming```, ```zookeeper```<br/>
+后台：```java```, ```python```, ```spring```, ```mybaits```
+
+### 流程
+1, 数据接入发送至kafka topic -> ```HC00_APPLICATION_SUBMIT```,返回调用方接收数据成功。<br/>
+2, kafka消费者对接收申请数据消费，topic存在两个分区；为增加并行性，采用两个消费者对0/1分区消费。<br/>
+3, 申请数据预处理(栏位清洗)，主要为必要查询hbase字段，通过清洗的申请数据栏位，第一次查询hbase数据；该部分数据为```application_{train|test}.csv```聚合提取数据。<br/>
+4, 数据清洗，针对申请数据进行特征提取。<br/>
+5, 第二次查询hbase数据，新增 ```bureau.csv``` + ```bureau_balance.csv```数据提取字段。<br/>
+6, 第三次查询hbase数据，新增 ```previous_application.csv```数据提取字段。<br/>
+7, 第四次查询hbase数据，新增 ```POS_CASH_balance.csv```数据提取字段。<br/>
+8, 第五次查询hbase数据，新增 ```installments_payments.csv```数据提取字段。<br/>
+9, 第六次查询hbase数据，新增 ```credit_card_balance.csv```数据提取字段。<br/>
+10,第二次数据清洗，特征计算，这里的栏位依赖hbase查询结果。<br/>
+11，调用model服务，预测结果，数据落地 -> mysql。
