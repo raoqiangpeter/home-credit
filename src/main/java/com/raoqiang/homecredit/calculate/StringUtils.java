@@ -1,5 +1,8 @@
 package com.raoqiang.homecredit.calculate;
 
+/**
+ * Test
+ */
 public class StringUtils {
 
     public static final String standard = "AMT_ANNUITY\n" +
